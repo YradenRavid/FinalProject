@@ -1,0 +1,26 @@
+{
+    "image_size": [832 ,992],
+    "number_of_frames": 500,
+    "batch_size": 1,
+    "data_sets": "",
+    "num_of_threads": 4,
+    "data_format": "NHWC",
+    "capacity": 10,
+    "channels": 1,
+    "num_of_epochs": 100,
+    "min_after_dequeue": 2,
+    "crop_size": [10, 10],
+    "crop":1,
+    "flip":0,
+    "rotate":1,
+    "rank_type":"dice",
+    "standard_file_type": ".tiff",
+    "directories":
+        {
+            "dir_name" : ["/Users/asafmanor/Documents/GitHub/CSRNet/data/TDG/fluo-c2dl-msc"],
+            "file_type": [".tiff" ]
+        }
+}
+
+
+
