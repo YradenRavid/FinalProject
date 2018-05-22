@@ -170,7 +170,7 @@ class RibCageRegressionNet(_BaseModel):
         center_ribs = []
         sternum = []
 
-        segs = features['segs']
+        segs = features['Rots']
         images = features['images']
 
         assert(segs.shape.as_list() == images.shape.as_list())

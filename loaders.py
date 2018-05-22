@@ -126,20 +126,22 @@ class DatasetLoader():
 
         fix_image_list = []
         Rot_image_list = []
-        degrees_list = []
+        label_list = []
 
         # load image names into a list
         imagedir = (self.directory + '/%s' % datadir)
         # TODO think if we don't want to get the absolute dir
         # in the function call (load function in origin)
         fix_image_list.append((imagedir + '/fix_image.mat'))
-        current_dir = (imagedir + '/RotateImages')
-        Rot_filenames = os.listdir(current_dir)
+        current_dir1 = (imagedir + '/RotateImages')
+        Rot_filenames = os.listdir(current_dir1)
         for Rot_image in Rot_filenames:
-            Rot_image_list.append((current_dir + '/%s' % Rot_image))
-            degrees_name = Rot_image.split("D") #name of rotate files is i.e 3Degrees.mat
-            degrees_list.append = map(int, degrees_name[0])
-         return Rot_image_list, fix_image_list , degrees_list
+            Rot_image_list.append((current_dir1 + '/%s' % Rot_image))
+        current_dir2 = (imagedir + '/labels')
+        label_filenames = os.listdir(current_dir2)
+        for label in label_filenames:
+            Rot_image_list.append((current_dir2 + '/%s' % label))
+        return Rot_image_list, fix_image_list , label_list
 
     def intelligent_load(self, dir_list):
         """Load images and segmentations intelligently, minimizing memory excess use.
