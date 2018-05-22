@@ -19,7 +19,7 @@
   "pool_strides": 1,
 
   "fc_depth": 3,
-  "fc_units_list": [64, 64, 1],
+  "fc_units_list": [64, 64, 14],
 
   "batch_size": 64,
   "num_epochs": 100,
