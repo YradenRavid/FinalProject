@@ -6,8 +6,8 @@
   "conv_depth": 3,
   "conv_filters_list": [32, 64, 128],
 
-  "batch_norm_axis": "None",
-  "concat_dim": "None",
+  "batch_norm_axis": -1,
+  "concat_dim": 3,
 
   "activation": "leaky_relu",
   "loss": "mse",
@@ -19,7 +19,7 @@
   "pool_strides": 1,
 
   "fc_depth": 3,
-  "fc_units_list": [64, 64, 14],
+  "fc_units_list": [64, 64, 15],
 
   "batch_size": 64,
   "num_epochs": 100,
