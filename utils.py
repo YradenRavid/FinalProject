@@ -14,6 +14,7 @@ def import_json_config(config_path):
         NameError: If the file does not exist.
     
     """
+    """
     try:
         with open(config_path) as config_json:
             config = json.load(config_json)
@@ -22,3 +23,8 @@ def import_json_config(config_path):
     except NameError as ex:
         print("Read Error: no file named %s" % config_path)
         raise ex
+"""
+    config_file = open("config.json")
+    config = json.load(config_file)
+    config_file.close()
+    return config
