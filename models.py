@@ -220,7 +220,7 @@ class RibCageRegressionNet(_BaseModel):
                 sternum.append(
                     tf.layers.dense(sternum[d - 1], units, name='fc_' + str(d)))
             with tf.variable_scope('predictions'):
-                self.predictions = tf.reshape(tf.sigmoid(sternum[d], 'sigmoid'), [-1])
+                self.predictions = tf.sigmoid(sternum[d], 'sigmoid')
             return self.predictions
 
     @staticmethod
@@ -281,7 +281,7 @@ class RibCageRegressionNet(_BaseModel):
             train_op = optimizer.minimize(train_loss_op, global_step=tf.train.get_global_step())
 
         # Create logging hooks
-        log_hook = tf.train.LoggingTensorHook({'loss': train_loss_op}, every_n_iter=100)
+        log_hook = tf.train.LoggingTensorHook({'loss': train_loss_op}, every_n_iter=1)
 
         return tf.estimator.EstimatorSpec(
             mode=mode,
