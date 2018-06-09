@@ -1,17 +1,18 @@
 {
     "image_size": [257 ,257],
+    "label_size": 15,
     "batch_size": 10,
     "data_format": "NHWC",
     "channels": 1,
     "num_of_epochs": 3,
     "crop_size": [10, 10],
-    "crop":1,
+    "crop":0,
     "flip":0,
-    "rotate":1,
+    "rotate":0,
     "standard_file_type": ".mat",
     "directories":
         {
-            "dir_name" : ["/Users/asafmanor/Documents/GitHub/CSRNet/data/TDG/fluo-c2dl-msc"],
+            "dir_name" : ["config.json"],
             "file_type": [".mat" ]
         },
 
@@ -20,8 +21,8 @@
   "conv_depth": 3,
   "conv_filters_list": [32, 64, 128],
 
-  "batch_norm_axis": "None",
-  "concat_dim": "None",
+  "batch_norm_axis": -1,
+  "concat_dim": 3,
 
   "activation": "leaky_relu",
   "loss": "mse",
@@ -33,7 +34,7 @@
   "pool_strides": 1,
 
   "fc_depth": 3,
-  "fc_units_list": [64, 64, 14],
+  "fc_units_list": [64, 64, 15],
 
   "learning_rate": 0.001
 }
