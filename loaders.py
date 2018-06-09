@@ -3,6 +3,7 @@ import tensorflow as tf
 import utils
 import os
 import scipy.io
+
 import matplotlib.pyplot as plt
 # from PIL import Image
 
@@ -51,43 +52,52 @@ class DatasetLoader():
         self.num_of_epochs = self.params["num_of_epochs"]
         self.channels = self.params["channels"]
         self.image_size = self.params["image_size"]
+        self.label_size = self.params["label_size"]
         self.directory = os.getcwd()
 
     def _single_load(self, _dir):
         # TODO this function needs some cleaning
-        Rot_list, image_list , degrees_list = self._image_pairs(_dir)
+        Rot_list, image_list, degrees_list = self._image_pairs(_dir)
         Rot_files = np.ndarray([len(Rot_list), self.image_size[0], self.image_size[1], self.channels])
-
+        label_files = np.ndarray([len(degrees_list), self.label_size])
         image_files = np.ndarray([len(image_list), self.image_size[0], self.image_size[1], self.channels])
         idx = 0
-        for Rot in Rot_files:
+        for Rot in Rot_list:
             if os.path.splitext(Rot)[1] == '.mat':
-                Rot_files[idx, :, :, :] = np.expand_dims(scipy.io.loadmat(Rot), axis=2)
-            elif self.channels == 3:
-                pass
+                temp = scipy.io.loadmat(Rot)
+                Rot_files[idx, :, :, :] = np.expand_dims(temp['rotate_image'], axis=3)
             else:
                 pass
             idx += 1
         idx = 0
         for image in image_list:
             if os.path.splitext(image)[1] == '.mat':
-                image_files[idx, :, :, :] = np.expand_dims(scipy.io.loadmat(image), axis=2)
-            elif self.channels == 3:
-                pass
+                temp = scipy.io.loadmat(image)
+                image_files[idx, :, :, :] = np.expand_dims(temp['fix_image'], axis=3)
             else:
                 pass
             idx += 1
+        idx = 0
+        for label in degrees_list:
+            if os.path.splitext(label)[1] == '.mat':
+                temp = scipy.io.loadmat(label)
+                temp = np.resize(temp['label_array'], [1, self.label_size])
+                label_files[idx, :] = temp
+            else:
+                pass
+            idx += 1
+
         image_tensor = tf.convert_to_tensor(image_files, dtype=np.float32)
         # TODO check if the float32 type reduce the resolution
         Rot_tensor = tf.convert_to_tensor(Rot_files, dtype=np.float32)
-        Degrees_tensor = tf.convert_to_tensor(degrees_list, dtype=np.float32)
+        label_tensor = tf.convert_to_tensor(label_files, dtype=np.float32)
         # ranks_tensor = tf.reshape(ranks_tensor, [-1, 1])
 
-        return image_tensor, Rot_tensor, Degrees_tensor
+        return image_tensor, Rot_tensor, label_tensor
 
-    def _spatial_augmentation(self, seg, image, rank):
+    def _spatial_augmentation(self, image, Rot, label):
         # concat seg and image together:
-        batch = tf.concat(axis=2, values=[seg, image])
+        batch = tf.concat(axis=2, values=[Rot, image])
         if self.params["crop"]:
             batch = self._random_crop(batch)
         if self.params["flip"]:
@@ -96,10 +106,10 @@ class DatasetLoader():
         if self.params["rotate"]:
             batch = tf.image.rot90(batch, k=np.random.randint(0, 3))
             # separate seg and image:
-        seg = batch[:, :, 0:self.params["channels"]]
+        Rot = batch[:, :, 0:self.params["channels"]]
         image = batch[:, :, self.params["channels"]:2 * self.params["channels"]]
 
-        return seg, image, rank
+        return image, Rot, label
 
     def _random_crop(self, batch):
         return tf.random_crop(batch, [self.crop_size[0], self.crop_size[1], self.params["channels"] * 2])
@@ -124,23 +134,29 @@ class DatasetLoader():
 
     def _image_pairs(self, datadir):
 
+
         fix_image_list = []
         Rot_image_list = []
         label_list = []
 
         # load image names into a list
-        imagedir = (self.directory + '/%s' % datadir)
+        imagedir = ('C:/finalProject/csrn-master' + '/%s' %datadir)
         # TODO think if we don't want to get the absolute dir
         # in the function call (load function in origin)
-        fix_image_list.append((imagedir + '/fix_image.mat'))
-        current_dir1 = (imagedir + '/RotateImages')
-        Rot_filenames = os.listdir(current_dir1)
-        for Rot_image in Rot_filenames:
-            Rot_image_list.append((current_dir1 + '/%s' % Rot_image))
-        current_dir2 = (imagedir + '/labels')
-        label_filenames = os.listdir(current_dir2)
-        for label in label_filenames:
-            Rot_image_list.append((current_dir2 + '/%s' % label))
+        Brain_filenames = os.listdir(imagedir)
+        for Brain in Brain_filenames:
+            BrainSlices_filenames = os.listdir(imagedir + '/%s' %Brain )
+            currdir = (imagedir + '/%s' %Brain )
+            for BrainSlice in BrainSlices_filenames:
+                Slice_dir = (currdir + '/%s' % BrainSlice)
+                labels = os.listdir(Slice_dir + '/labels')
+                Rot_images = os.listdir(Slice_dir + '/RotateImages')
+                fix_image_list.append((Slice_dir + '/fix_image.mat'))
+                for label in labels:
+                    label_list.append((Slice_dir + '/labels' + '/%s' %label))
+                for Rot_image in Rot_images:
+                    Rot_image_list.append((Slice_dir + '/RotateImages' + '/%s' %Rot_image))
+
         return Rot_image_list, fix_image_list , label_list
 
     def intelligent_load(self, dir_list):
@@ -191,7 +207,7 @@ class DatasetLoader():
         num_Rot = Rots.shape.as_list()[0]
 
         images = tf.tile(images, [np.int32(num_Rot / num_images), 1, 1, 1])
-        degrees = tf.reshape(degrees, [-1])
+        #degrees = tf.reshape(degrees, [-1])
         # will raise exception if number of images != number of segs
         return tf.data.Dataset.from_tensor_slices((images, Rots, degrees))
 
@@ -218,7 +234,7 @@ class DatasetLoader():
             repeat_num = self.num_of_epochs
         
         # TODO asaf - 128 is an arbitrary number for the buffer size in shuffle
-        dataset = dataset.map(self._spatial_augmentation)
+        #dataset = dataset.map(self._spatial_augmentation)
         return dataset.shuffle(128).batch(batch_size).repeat(repeat_num)
 
     @staticmethod
