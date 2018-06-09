@@ -18,7 +18,7 @@ function  GenerateDescriminatorData(InputPath,OutputPath,brains,Slices,RangeOfDe
 % [0.05 0.15 0.6 0.15 0.05 0 0 0 0 0 0 0 0 0 0]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-addpath('C:\Users\ιψγο ψαιγ\Desktop\MRI'); %where nii library is
+addpath('C:\Users\Χ™Χ¨Χ“Χ Χ¨Χ‘Χ™Χ“\Desktop\MRI'); %where nii library is
 addpath(InputPath);
 
 
