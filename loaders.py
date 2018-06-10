@@ -140,7 +140,7 @@ class DatasetLoader():
         label_list = []
 
         # load image names into a list
-        imagedir = ('C:/finalProject/csrn-master' + '/%s' %datadir)
+        imagedir = (self.directory + '/%s' %datadir)
         # TODO think if we don't want to get the absolute dir
         # in the function call (load function in origin)
         Brain_filenames = os.listdir(imagedir)
