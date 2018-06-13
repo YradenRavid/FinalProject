@@ -281,8 +281,8 @@ class RibCageRegressionNet(_BaseModel):
             train_op = optimizer.minimize(train_loss_op, global_step=tf.train.get_global_step())
 
         # Create logging hooks
-        log_hook = tf.train.LoggingTensorHook({'loss': train_loss_op}, every_n_iter=1)
-        print(train_loss_op)
+        to_log = {"loss": train_loss_op, "TrainPredictions": train_predictions, "TestPredictions": test_predictions}
+        log_hook = tf.train.LoggingTensorHook(to_log, every_n_iter=1)
 
         return tf.estimator.EstimatorSpec(
             mode=mode,
